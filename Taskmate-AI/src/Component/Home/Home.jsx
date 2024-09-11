@@ -1,18 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, ReactNode } from 'react'
 // shadcn/ui components for consistent, accessible UI elements
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 // Lucide React icons for a cohesive icon set
 import { CheckCircle, Clock, Zap } from 'lucide-react'
 
+// Define a type for the modal state
+type ModalType = 'about' | 'signup' | 'login' | null
+
 export default function Home() {
   // State to handle which modal is currently open
-  const [activeModal, setActiveModal] = useState(null)
+  const [activeModal, setActiveModal] = useState<ModalType>(null)
 
   // Function to open a specific modal
-  const handleOpenModal = (modalType) => setActiveModal(modalType)
+  const handleOpenModal = (modalType: ModalType) => setActiveModal(modalType)
   
   // Function to close the active modal
   const handleCloseModal = () => setActiveModal(null)
@@ -142,8 +145,15 @@ export default function Home() {
   )
 }
 
+// Define types for the props of FeatureCard component
+interface FeatureCardProps {
+  icon: ReactNode
+  title: string
+  description: string
+}
+
 // Reusable component for feature cards
-function FeatureCard({ icon, title, description }) {
+function FeatureCard({ icon, title, description }: FeatureCardProps) {
   return (
     <div className="bg-white/20 backdrop-blur-lg rounded-lg p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 animate-fade-in-up">
       <div className="mb-4">{icon}</div>
