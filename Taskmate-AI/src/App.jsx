@@ -1,16 +1,17 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import React from 'react'
 import './App.css'
-import HomeComponent from './Component/Home/Home'
-import HomePage from './Pages/HomePage'
-
+import Home from './Pages/Home'
+import AppRouter from './Router/Router'
+import { BrowserRouter as Router } from 'react-router-dom';
 function App() {
 
 
   return (
     <>
-    <HomePage/>
+   <Router>
+      <AppRouter />
+    </Router>
+    <Home/>
     </>
   )
 }
