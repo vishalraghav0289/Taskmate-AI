@@ -1,23 +1,15 @@
 'use client'
 
-import { useState, ReactNode } from 'react'
-// shadcn/ui components for consistent, accessible UI elements
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-// Lucide React icons for a cohesive icon set
+import { useState } from 'react'
+import { Button } from "../Conatiner/Button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../Conatiner/Dialog"
 import { CheckCircle, Clock, Zap } from 'lucide-react'
 
-// Define a type for the modal state
-type ModalType = 'about' | 'signup' | 'login' | null
-
 export default function Home() {
-  // State to handle which modal is currently open
-  const [activeModal, setActiveModal] = useState<ModalType>(null)
+  const [activeModal, setActiveModal] = useState(null)
 
-  // Function to open a specific modal
-  const handleOpenModal = (modalType: ModalType) => setActiveModal(modalType)
+  const handleOpenModal = (modalType) => setActiveModal(modalType)
   
-  // Function to close the active modal
   const handleCloseModal = () => setActiveModal(null)
 
   return (
@@ -26,7 +18,6 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="text-2xl font-bold text-white">Task Mate AI</div>
           <nav className="space-x-2">
-            {/* Button components from shadcn/ui for consistent styling */}
             <Button 
               onClick={() => handleOpenModal('about')}
               variant="ghost"
@@ -67,7 +58,6 @@ export default function Home() {
               Get Started
             </Button>
           </div>
-          {/* Animated background elements */}
           <div className="absolute top-0 left-0 w-full h-full">
             <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
             <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-cyan-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
@@ -105,7 +95,6 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Dialog component from shadcn/ui for accessible modal dialogs */}
       <Dialog open={activeModal === 'login'} onOpenChange={() => activeModal === 'login' && handleCloseModal()}>
         <DialogContent className="bg-gradient-to-br from-purple-600 to-blue-600 text-white">
           <DialogHeader>
@@ -145,15 +134,7 @@ export default function Home() {
   )
 }
 
-// Define types for the props of FeatureCard component
-interface FeatureCardProps {
-  icon: ReactNode
-  title: string
-  description: string
-}
-
-// Reusable component for feature cards
-function FeatureCard({ icon, title, description }: FeatureCardProps) {
+function FeatureCard({ icon, title, description }) {
   return (
     <div className="bg-white/20 backdrop-blur-lg rounded-lg p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 animate-fade-in-up">
       <div className="mb-4">{icon}</div>
