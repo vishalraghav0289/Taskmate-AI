@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { openModal, closeModal } from '../Feature/auth/authSlice'; //  todo: Work on it add more  actions
+import { openModal, closeModal } from '../Feature/auth/authSlice';
+import Login from './Login';//  todo: Work on it add more  actions
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -23,6 +24,7 @@ const Home = () => {
           <nav className="space-x-2">
             <button 
               onClick={() => handleOpenModal('about')}
+              variant="ghost"
               className="text-white hover:bg-white/20 transition-all duration-300 px-4 py-2 rounded"
             >
               About Us
@@ -96,24 +98,41 @@ const Home = () => {
         </div>
       </footer>
 
+      // here we try to do conditional rendering 
+
       {activeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white text-purple-700 p-8 rounded-lg">
-            <h2 className="text-2xl font-bold mb-4">
-              {activeModal === 'about' && 'About Us'}
-              {activeModal === 'signup' && 'Sign Up'}
-              {activeModal === 'login' && 'Login'}
-            </h2>
-            <p className="mb-4">This feature is coming soon!</p>
-            <button
-              onClick={handleCloseModal}
-              className="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
-            >
-              Close
-            </button>
-          </div>
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="bg-white text-purple-700 p-8 rounded-lg">
+      {activeModal === 'about' && (
+        <div>
+          <h2 className="text-2xl font-bold mb-4">About Us</h2>
+          <p className="mb-4">This feature is coming soon!</p>
+          <button
+            onClick={handleCloseModal}
+            className="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
+          >
+            Close
+          </button>
         </div>
       )}
+      {activeModal === 'signup' && (
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Sign Up</h2>
+          <p className="mb-4">This feature is coming soon!</p>
+          <button
+            onClick={handleCloseModal}
+            className="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      )}
+      {activeModal === 'login' && (
+        <Login /> // Render the Login component here
+      )}
+    </div>
+  </div>
+)}
     </div>
   );
 };
