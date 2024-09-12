@@ -12,12 +12,8 @@ const Login = () => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center">
-      {/* Blurred background */}
-      <div className="absolute inset-100 bg-gradient-to-br from-purple-700 via-blue-600 to-cyan-500 backdrop-blur-md"></div>
-      
-      {/* Login form */}
-      <div className="bg-white p-8 rounded-lg shadow-xl w-96 z-10">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-700 via-blue-600 to-cyan-500">
+      <div className="bg-white p-8 rounded-lg shadow-xl w-96 max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center text-purple-700">Login to Task Mate AI</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -52,8 +48,8 @@ const Login = () => {
           </button>
         </form>
         <div className="mt-4 text-center">
-          <Link to="/signup" className="font-medium text-purple-600 hover:text-purple-500">
-            Don't have an account? Sign up
+          <Link to="/" className="font-medium text-purple-600 hover:text-purple-500">
+            Back to Home
           </Link>
         </div>
         {showMessage && (

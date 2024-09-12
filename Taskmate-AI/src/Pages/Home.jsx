@@ -1,10 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link , useNavigate} from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { openModal, closeModal } from '../Feature/auth/authSlice';
 import Login from './Login';//  todo: Work on it add more  actions
 
+
+
 const Home = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const activeModal = useSelector((state) => state.modal.activeModal);
 
@@ -36,7 +39,7 @@ const Home = () => {
               Sign Up
             </button>
             <button 
-              onClick={() => handleOpenModal('login')}
+              onClick={() => navigate('/login')}
               className="bg-white text-purple-700 hover:bg-purple-100 transition-all duration-300 px-4 py-2 rounded"
             >
               Login
@@ -127,9 +130,7 @@ const Home = () => {
           </button>
         </div>
       )}
-      {activeModal === 'login' && (
-        <Login /> // Render the Login component here
-      )}
+
     </div>
   </div>
 )}

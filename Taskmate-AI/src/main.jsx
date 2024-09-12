@@ -9,19 +9,15 @@ import  Signup from "./Pages/Signup.jsx"
 import   Login from "./Pages/Login.jsx"
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-
+import Layout from './Layout/Layout.jsx';
 
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Home />,
+      element: <Home/>,
       children: [
           {
-              path: "/",
-              element: <Home />,
-          },
-          {
-              path: "/Login",
+              path: "/login",
               element: (
                       <Login />
 
