@@ -39,7 +39,7 @@ const Home = () => {
               Sign Up
             </button>
             <button 
-              onClick={() => navigate('/login')}
+              onClick={() => handleOpenModal('login')}
               className="bg-white text-purple-700 hover:bg-purple-100 transition-all duration-300 px-4 py-2 rounded"
             >
               Login
@@ -50,19 +50,20 @@ const Home = () => {
 
       <main className="flex-grow">
         <section className="py-20 relative overflow-hidden">
-          <div className="container mx-auto px-4 text-center relative z-10">
+          <div className="container mx-auto px-4 text-center relative  ">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in-up">
               Manage Tasks Smarter with AI
             </h1>
             <p className="text-xl mb-8 text-cyan-200 animate-fade-in-up animation-delay-300">
               Task Mate AI revolutionizes your productivity with intelligent task management
             </p>
-            <Link 
-              to="/signup"
-              className="inline-block bg-white text-purple-700 hover:bg-purple-100 hover:scale-105 transition-all duration-300 px-8 py-3 rounded-full text-lg font-semibold"
+            <button
+                Link  to="/signup"
+                  className="inline-block bg-white text-purple-700 hover:bg-purple-100 hover:scale-105 transition-all duration-300 px-8 py-3 rounded-full text-lg font-semibold z-10 shadow-lg hover:shadow-xl active:scale-95"
             >
-              Get Started
-            </Link>
+            Get Started
+              </button>
+
           </div>
           <div className="absolute top-0 left-0 w-full h-full">
             <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
@@ -130,6 +131,17 @@ const Home = () => {
           </button>
         </div>
       )}
+      {activeModal === 'login'  && (
+        <div>
+          <Login/>
+          <button
+            onClick={handleCloseModal}
+            className="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
+          >
+            Close
+          </button>
+          </div>
+      )} 
 
     </div>
   </div>
