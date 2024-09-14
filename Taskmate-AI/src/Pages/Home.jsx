@@ -3,6 +3,7 @@ import { Link , useNavigate} from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { openModal, closeModal } from '../Feature/auth/authSlice';
 import Login from './Login';//  todo: Work on it add more  actions
+import Signup from './Signup';
 
 
 
@@ -58,7 +59,7 @@ const Home = () => {
               Task Mate AI revolutionizes your productivity with intelligent task management
             </p>
             <button
-                Link  to="/signup"
+                 to="/signup"
                   className="inline-block bg-white text-purple-700 hover:bg-purple-100 hover:scale-105 transition-all duration-300 px-8 py-3 rounded-full text-lg font-semibold z-10 shadow-lg hover:shadow-xl active:scale-95"
             >
             Get Started
@@ -121,8 +122,7 @@ const Home = () => {
       )}
       {activeModal === 'signup' && (
         <div>
-          <h2 className="text-2xl font-bold mb-4">Sign Up</h2>
-          <p className="mb-4">This feature is coming soon!</p>
+          <Signup/>
           <button
             onClick={handleCloseModal}
             className="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
