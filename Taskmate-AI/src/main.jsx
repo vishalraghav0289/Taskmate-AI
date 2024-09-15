@@ -9,10 +9,11 @@ import Login from "./Pages/Login.jsx";
 import ReactDOM from 'react-dom/client';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import TaskList from "../src/InnerPages/TaskList.jsx"
+import TaskManagement from './InnerPages/TaskManagament.jsx';
 
 
 // Placeholder components for other pages
-const TaskManagement = () => <div>Task Management Page</div>;
+
 const AI = () => <div>AI Page</div>;
 const Roadmap = () => <div>Roadmap Page</div>;
 const StartMyDay = () => <div>Start My Day Page</div>;
