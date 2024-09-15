@@ -1,16 +1,20 @@
 import React from 'react';
-import { Link , useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { openModal, closeModal } from '../Feature/auth/authSlice';
-import Login from './Login';//  todo: Work on it add more  actions
+import Login from './Login';
 import Signup from './Signup';
-
-
+import TaskList from '../InnerPages/TaskList';
 
 const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const activeModal = useSelector((state) => state.modal.activeModal);
+
+  const handleNavigate = () => {
+    console.log('Navigating to tasklist');
+    navigate('/tasklist');
+  };
 
   const handleOpenModal = (modalType) => {
     dispatch(openModal(modalType));
@@ -28,7 +32,6 @@ const Home = () => {
           <nav className="space-x-2">
             <button 
               onClick={() => handleOpenModal('about')}
-              variant="ghost"
               className="text-white hover:bg-white/20 transition-all duration-300 px-4 py-2 rounded"
             >
               About Us
@@ -51,7 +54,7 @@ const Home = () => {
 
       <main className="flex-grow">
         <section className="py-20 relative overflow-hidden">
-          <div className="container mx-auto px-4 text-center relative  ">
+          <div className="container mx-auto px-4 text-center relative z-10">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in-up">
               Manage Tasks Smarter with AI
             </h1>
@@ -59,12 +62,11 @@ const Home = () => {
               Task Mate AI revolutionizes your productivity with intelligent task management
             </p>
             <button
-                 to="/signup"
-                  className="inline-block bg-white text-purple-700 hover:bg-purple-100 hover:scale-105 transition-all duration-300 px-8 py-3 rounded-full text-lg font-semibold z-10 shadow-lg hover:shadow-xl active:scale-95"
+              onClick={handleNavigate} 
+              className="inline-block bg-white text-purple-700 hover:bg-purple-100 hover:scale-105 transition-all duration-300 px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl active:scale-95"
             >
-            Get Started
-              </button>
-
+              Get Started
+            </button>
           </div>
           <div className="absolute top-0 left-0 w-full h-full">
             <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
@@ -103,49 +105,47 @@ const Home = () => {
         </div>
       </footer>
 
-      // here we try to do conditional rendering 
-
+      {/* Modal rendering logic */}
       {activeModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div className="bg-white text-purple-700 p-8 rounded-lg">
-      {activeModal === 'about' && (
-        <div>
-          <h2 className="text-2xl font-bold mb-4">About Us</h2>
-          <p className="mb-4">This feature is coming soon!</p>
-          <button
-            onClick={handleCloseModal}
-            className="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
-          >
-            Close
-          </button>
-        </div>
-      )}
-      {activeModal === 'signup' && (
-        <div>
-          <Signup/>
-          <button
-            onClick={handleCloseModal}
-            className="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
-          >
-            Close
-          </button>
-        </div>
-      )}
-      {activeModal === 'login'  && (
-        <div>
-          <Login/>
-          <button
-            onClick={handleCloseModal}
-            className="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
-          >
-            Close
-          </button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white text-purple-700 p-8 rounded-lg">
+            {activeModal === 'about' && (
+              <div>
+                <h2 className="text-2xl font-bold mb-4">About Us</h2>
+                <p className="mb-4">This feature is coming soon!</p>
+                <button
+                  onClick={handleCloseModal}
+                  className="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            )}
+            {activeModal === 'signup' && (
+              <div>
+                <Signup />
+                <button
+                  onClick={handleCloseModal}
+                  className="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            )}
+            {activeModal === 'login' && (
+              <div>
+                <Login />
+                <button
+                  onClick={handleCloseModal}
+                  className="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            )}
           </div>
-      )} 
-
-    </div>
-  </div>
-)}
+        </div>
+      )}
     </div>
   );
 };
