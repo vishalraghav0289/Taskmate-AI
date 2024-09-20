@@ -5,11 +5,11 @@ import { X } from 'lucide-react';
 
 const TaskManagement = () => {
   const [tasks, setTasks] = useState({
-    todo: [],
     urgentImportant: [],
     importantNotUrgent: [],
     urgentNotImportant: [],
-    neitherUrgentNorImportant: []
+    neitherUrgentNorImportant: [],
+    todo: []
   });
 
   useEffect(() => {
@@ -52,7 +52,7 @@ const TaskManagement = () => {
           ref={provided.innerRef}
           className="bg-white p-4 rounded-lg shadow-md flex-1 min-h-[200px]"
         >
-          <h2 className="text-lg font-semibold mb-4">{title}</h2>
+          <h2 className="text-lg font-semibold mb-4 font-handwritten text-gray-700">{title}</h2>
           {tasks[listId].map((task, index) => (
             <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
               {(provided, snapshot) => (
@@ -62,9 +62,9 @@ const TaskManagement = () => {
                   {...provided.dragHandleProps}
                   className={`p-2 mb-2 rounded-md ${
                     snapshot.isDragging ? 'bg-gray-100' : 'bg-gray-50'
-                  } relative group`}
+                  } relative group select-none`}
                 >
-                  {task.text}
+                  <span className="text-gray-800">{task.text}</span>
                   <button
                     onClick={() => deleteTask(listId, index)}
                     className="absolute top-1 right-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -102,11 +102,11 @@ const TaskManagement = () => {
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Task Management</h1>
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-            <TaskList listId="todo" title="To-Do" />
             <TaskList listId="urgentImportant" title="Urgent and Important" />
             <TaskList listId="importantNotUrgent" title="Important but Not Urgent" />
             <TaskList listId="urgentNotImportant" title="Urgent but Not Important" />
             <TaskList listId="neitherUrgentNorImportant" title="Neither Urgent nor Important" />
+            <TaskList listId="todo" title="To-Do" />
           </div>
         </DragDropContext>
       </div>
