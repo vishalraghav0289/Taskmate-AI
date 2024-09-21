@@ -14,7 +14,7 @@ export const TaskProvider = ({ children }) => {
   }, [tasks]);
 
   const addTask = (newTask) => {
-    setTasks(prevTasks => [...prevTasks, { ...newTask, id: Date.now() }]);
+    setTasks(prevTasks => [...prevTasks, { ...newTask, id: Date.now(), category: 'todo' }]);
   };
 
   const deleteTask = (id) => {
