@@ -1,4 +1,5 @@
 import React from 'react';
+import './index.css';
 import { Provider } from 'react-redux'; // Import Provider from react-redux
 import { store } from './Store/Store.js'; // Import the Redux store
 import './index.css';
@@ -10,6 +11,7 @@ import ReactDOM from 'react-dom/client';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import TaskList from "../src/InnerPages/TaskList.jsx"
 import TaskManagement from './InnerPages/TaskManagament.jsx';
+import { TaskProvider } from './Contexs/TaskContex.jsx';
 
 
 // Placeholder components for other pages
@@ -53,10 +55,13 @@ const router = createBrowserRouter([
   }
 ]);
 
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router} />
+      <TaskProvider> {/* Wrap your entire application with TaskProvider */}
+        <RouterProvider router={router} />
+      </TaskProvider>
     </Provider>
   </React.StrictMode>
 );

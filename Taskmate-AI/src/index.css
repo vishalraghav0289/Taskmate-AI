@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+.font-handwritten {
+  font-family: 'Caveat', cursive;
+}
+
+.task-heading {
+  position: relative;
+  display: inline-block;
+}
+
+.task-heading::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #4B5563;
+  transform: scaleX(0.95) skew(-10deg);
+}
+
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;

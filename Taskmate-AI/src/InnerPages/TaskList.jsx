@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PlusCircle, Edit2, Trash2, CheckCircle, Clock } from 'lucide-react';
-import useTasks from '../CustomHooks /useTasks';
+import useTasks  from '../CustomHooks /useTasks';
 
 const TaskList = () => {
   const { tasks, addTask, deleteTask, updateTask } = useTasks();
@@ -59,7 +59,9 @@ const TaskList = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-gray-100">
+    
+    <div style={{ width: '100vw', padding: '0 20px' }}
+    className="flex min-h-screen w-full bg-gray-100">
       {/* Left-hand side menu */}
       <div className="w-64 bg-white shadow-md flex-shrink-0">
         <div className="p-4">
@@ -75,8 +77,8 @@ const TaskList = () => {
       </div>
 
       {/* Main content area */}
-      <div className="flex-1 overflow-x-hidden overflow-y-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex-1 overflow-x-hidden overflow-y-auto flex-grow">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">Task List</h1>
 
           {/* Add task form */}

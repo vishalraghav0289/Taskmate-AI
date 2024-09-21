@@ -1,47 +1,24 @@
-import React, { useState, useEffect } from 'react';
+// src/components/TaskManagement.js
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { X } from 'lucide-react';
+import  useTasks  from '../CustomHooks /useTasks';
 
 const TaskManagement = () => {
-  const [tasks, setTasks] = useState({
-    urgentImportant: [],
-    importantNotUrgent: [],
-    urgentNotImportant: [],
-    neitherUrgentNorImportant: [],
-    todo: []
-  });
-
-  useEffect(() => {
-    const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    setTasks({ ...tasks, todo: storedTasks });
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(tasks.todo));
-  }, [tasks]);
+  const { tasks, deleteTask, updateTask } = useTasks();
 
   const onDragEnd = (result) => {
     const { source, destination } = result;
 
     if (!destination) return;
 
-    const sourceList = tasks[source.droppableId];
-    const destList = tasks[destination.droppableId];
-    const [reorderedItem] = sourceList.splice(source.index, 1);
-    destList.splice(destination.index, 0, reorderedItem);
-
-    setTasks({
-      ...tasks,
-      [source.droppableId]: sourceList,
-      [destination.droppableId]: destList
-    });
+    const updatedTask = tasks.find(task => task.id.toString() === result.draggableId);
+    updateTask(updatedTask.id, { category: destination.droppableId });
   };
 
-  const deleteTask = (listId, index) => {
-    const newTasks = { ...tasks };
-    newTasks[listId].splice(index, 1);
-    setTasks(newTasks);
+  const getTasksForCategory = (category) => {
+    return tasks.filter(task => task.category === category);
   };
 
   const TaskList = ({ listId, title }) => (
@@ -52,8 +29,12 @@ const TaskManagement = () => {
           ref={provided.innerRef}
           className="bg-white p-4 rounded-lg shadow-md flex-1 min-h-[200px]"
         >
-          <h2 className="text-lg font-semibold mb-4 font-handwritten text-gray-700">{title}</h2>
-          {tasks[listId].map((task, index) => (
+          <h2 className="text-xl font-bold mb-4 font-handwritten text-gray-800 transform -rotate-2">
+            <span className="inline-block px-2 py-1 bg-yellow-100 rounded">
+              {title}
+            </span>
+          </h2>
+          {getTasksForCategory(listId).map((task, index) => (
             <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
               {(provided, snapshot) => (
                 <div
@@ -66,7 +47,7 @@ const TaskManagement = () => {
                 >
                   <span className="text-gray-800">{task.text}</span>
                   <button
-                    onClick={() => deleteTask(listId, index)}
+                    onClick={() => deleteTask(task.id)}
                     className="absolute top-1 right-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <X size={16} />
