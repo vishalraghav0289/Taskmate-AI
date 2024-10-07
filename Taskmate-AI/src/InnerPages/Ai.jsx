@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Send, Loader, ThumbsUp, ThumbsDown, Copy } from 'lucide-react';
-import axios from 'axios';
+import { Send, Loader } from 'lucide-react';
 
 const AI = () => {
   const [input, setInput] = useState('');
@@ -9,11 +8,46 @@ const AI = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
+  // Scroll to the bottom for new messages
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(scrollToBottom, [conversation]);
+
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  // Retry mechanism for handling rate-limiting errors
+  const fetchWithRetry = async (url, options, retries = 3, backoff = 300) => {
+    console.log("Fetch options:", options);
+    try {
+      const response = await fetch(url, options);
+      console.log("API Response status:", response.status);
+
+      if (response.status === 429 && retries > 0) {
+        console.warn(`Rate limited. Retrying after ${backoff}ms...`);
+        await sleep(backoff);
+        return fetchWithRetry(url, options, retries - 1, backoff * 2);
+      }
+
+      if (!response.ok) {
+        console.error(`Error! Status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const jsonResponse = await response.json();
+      console.log("API Response JSON:", jsonResponse);
+      return jsonResponse;
+
+    } catch (error) {
+      console.error("Error during fetch:", error);
+      if (retries > 0) {
+        await sleep(backoff);
+        return fetchWithRetry(url, options, retries - 1, backoff * 2);
+      }
+      throw error;
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,32 +58,44 @@ const AI = () => {
     setInput('');
     setIsLoading(true);
 
+    console.log("User message sent:", userMessage);
+
     try {
-      const result = await axios.post(
-        'https://api.openai.com/v1/chat/completions',
+      // Add console logs for debugging
+      console.log("Fetching API with the following headers:");
+      console.log("Authorization Header:", `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`);
+
+      const data = await fetchWithRetry(
+        '/api/v1/chat/completions', // Using proxy as per vite.config.js
         {
-          model: "gpt-3.5-turbo",
-          messages: [...conversation, userMessage],
-        },
-        {
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
+            'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
           },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [...conversation, userMessage],
+          })
         }
       );
-      const aiMessage = { role: 'assistant', content: result.data.choices[0].message.content };
+
+      const aiMessage = { role: 'assistant', content: data.choices[0].message.content };
+      console.log("AI Response received:", aiMessage);
+
       setConversation(prev => [...prev, aiMessage]);
+
     } catch (error) {
       console.error('Error calling OpenAI API:', error);
-      const errorMessage = { role: 'assistant', content: 'Sorry, there was an error processing your request.' };
+      const errorMessage = { role: 'assistant', content: 'Sorry, there was an error processing your request. Please try again later.' };
       setConversation(prev => [...prev, errorMessage]);
     }
+
     setIsLoading(false);
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-200">
       {/* Left-hand side menu */}
       <div className="w-64 bg-white shadow-md flex-shrink-0">
         <div className="p-4">
@@ -72,19 +118,6 @@ const AI = () => {
             <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-3/4 p-3 rounded-lg ${message.role === 'user' ? 'bg-purple-600 text-white' : 'bg-white'}`}>
                 <p>{message.content}</p>
-                {message.role === 'assistant' && (
-                  <div className="flex items-center mt-2 space-x-2">
-                    <button className="text-gray-500 hover:text-gray-700">
-                      <ThumbsUp size={16} />
-                    </button>
-                    <button className="text-gray-500 hover:text-gray-700">
-                      <ThumbsDown size={16} />
-                    </button>
-                    <button className="text-gray-500 hover:text-gray-700">
-                      <Copy size={16} />
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
           ))}
