@@ -1,226 +1,127 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { PlusCircle, Edit2, Trash2, CheckCircle, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Filter, SortAsc, LayoutGrid, MoreHorizontal, ChevronDown, User, Clock, ArrowUpDown } from 'lucide-react';
 
-const TaskList = () => {
-  const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState('');
-  const [editingTask, setEditingTask] = useState(null);
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [showTimeInputs, setShowTimeInputs] = useState(false);
+const StartDay = () => {
+  const navigate = useNavigate();
+  const [tasks, setTasks] = useState([
+    // Sample task data for illustration, you can modify it as needed.
+    { id: 1, name: 'Task 1', assignee: 'John', dueDate: '6 Oct - Today', priority: 'Low', status: 'On track' },
+    { id: 2, name: 'Task 2', assignee: 'Alice', dueDate: null, priority: 'Medium', status: 'At risk' },
+  ]);
 
-  // Load tasks from local storage on component mount
-  useEffect(() => {
-    const storedTasks = localStorage.getItem('tasks');
-    console.log('Loaded tasks from local storage:', storedTasks); // Debugging line
-    try {
-      const parsedTasks = JSON.parse(storedTasks);
-      if (Array.isArray(parsedTasks)) {
-        setTasks(parsedTasks);
-      } else {
-        console.error('Stored tasks are not an array:', parsedTasks);
+  const renderTaskList = (sectionTitle) => (
+    <div className="mb-6">
+      <div className="flex items-center mb-2">
+        <ChevronDown className="mr-2 text-gray-400" />
+        <h2 className="text-lg font-semibold text-gray-200">{sectionTitle}</h2>
+      </div>
+      {tasks.filter(task => task.status === sectionTitle).map(task => (
+        <div key={task.id} className="flex items-center py-2 border-b border-gray-700">
+          <input type="checkbox" className="mr-3" />
+          <div className="flex-1">
+            <p className="text-gray-200">{task.name}</p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+              <User size={16} className="text-white" />
+            </div>
+            {task.dueDate ? (
+              <span className="text-gray-400">{task.dueDate}</span>
+            ) : (
+              <Clock size={16} className="text-gray-400" />
+            )}
+            <div className="relative">
+              <span
+                className={`px-2 py-1 rounded text-xs cursor-pointer ${
+                  task.priority === 'Low' ? 'bg-green-800 text-green-200' :
+                  task.priority === 'Medium' ? 'bg-yellow-800 text-yellow-200' :
+                  'bg-red-800 text-red-200'
+                }`}
+                onClick={() => togglePriority(task.id)}
+              >
+                {task.priority}
+              </span>
+              <ArrowUpDown size={12} className="absolute -right-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
+            <span className={`px-2 py-1 rounded text-xs ${
+              task.status === 'On track' ? 'bg-green-800 text-green-200' :
+              task.status === 'At risk' ? 'bg-yellow-800 text-yellow-200' :
+              'bg-red-800 text-red-200'
+            }`}>
+              {task.status}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const togglePriority = (taskId) => {
+    setTasks(prevTasks => prevTasks.map(task => {
+      if (task.id === taskId) {
+        const priorities = ['Low', 'Medium', 'High'];
+        const currentIndex = priorities.indexOf(task.priority);
+        const nextPriority = priorities[(currentIndex + 1) % priorities.length];
+        return { ...task, priority: nextPriority };
       }
-    } catch (error) {
-      console.error('Error parsing stored tasks:', error);
-    }
-  }, []);
-
-  // Save tasks to local storage whenever tasks change
-  useEffect(() => {
-    console.log('Saving tasks to local storage:', tasks); // Debugging line
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-  }, [tasks]);
-
-  const addTask = () => {
-    if (newTask.trim() !== '') {
-      const taskToAdd = {
-        id: Date.now(),
-        text: newTask,
-        completed: false,
-        startTime,
-        endTime
-      };
-      console.log('Adding new task:', taskToAdd); // Debugging line
-      setTasks((prevTasks) => [...prevTasks, taskToAdd]);
-      resetForm();
-    }
+      return task;
+    }));
   };
 
-  const deleteTask = (id) => {
-    setTasks((prevTasks) => prevTasks.filter(task => task.id !== id));
-  };
-
-  const toggleComplete = (id) => {
-    setTasks((prevTasks) =>
-      prevTasks.map(task =>
-        task.id === id ? { ...task, completed: !task.completed } : task
-      )
-    );
-  };
-
-  const startEditing = (task) => {
-    setEditingTask(task);
-    setNewTask(task.text);
-    setStartTime(task.startTime);
-    setEndTime(task.endTime);
-    setShowTimeInputs(true);
-  };
-
-  const saveEdit = () => {
-    setTasks((prevTasks) =>
-      prevTasks.map(task =>
-        task.id === editingTask.id ? { ...task, text: newTask, startTime, endTime } : task
-      )
-    );
-    resetForm();
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      editingTask ? saveEdit() : addTask();
-    }
-  };
-
-  const toggleTimeInputs = () => {
-    setShowTimeInputs(!showTimeInputs);
-  };
-
-  const resetForm = () => {
-    setEditingTask(null);
-    setNewTask('');
-    setStartTime('');
-    setEndTime('');
-    setShowTimeInputs(false);
+  const handleManageEmail = () => {
+    navigate('/emailmanage');
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-gray-100" style={{ width: '100vw', boxSizing: 'border-box' }}>
+    <div className="flex h-screen bg-gray-900 text-gray-200">
       {/* Left-hand side menu */}
-      <div className="w-64 bg-white shadow-md flex-shrink-0">
+      <div className="w-64 bg-gray-800 shadow-md flex-shrink-0">
         <div className="p-4">
-          <h2 className="text-2xl font-bold text-purple-700">Task Mate AI</h2>
+          <h2 className="text-2xl font-bold text-purple-400">Task Mate AI</h2>
         </div>
         <nav className="mt-6">
-          <Link to="/tasklist" className="block py-2 px-4 text-gray-700 bg-gray-200 hover:bg-gray-300">Task List</Link>
-          <Link to="/taskmanagement" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">Task Management</Link>
-          <Link to="/ai" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">AI</Link>
-          <Link to="/roadmap" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">Roadmap</Link>
-          <Link to="/startmyday" className="block py-2 px-4 text-gray-700 hover:bg-gray-200">Start My Day</Link>
+          <Link to="/tasklist" className="block py-2 px-4 text-gray-400 hover:bg-gray-700">Task List</Link>
+          <Link to="/taskmanagement" className="block py-2 px-4 text-gray-400 hover:bg-gray-700">Task Management</Link>
+          <Link to="/ai" className="block py-2 px-4 text-gray-400 hover:bg-gray-700">AI</Link>
+          <Link to="/roadmap" className="block py-2 px-4 text-gray-400 hover:bg-gray-700">Roadmap</Link>
+          <Link to="/startmyday" className="block py-2 px-4 text-gray-400 bg-gray-700">Start My Day</Link>
         </nav>
       </div>
 
       {/* Main content area */}
-      <div className="flex-1 overflow-x-hidden overflow-y-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">Task List</h1>
-
-          {/* Add task form */}
-          <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
-              <input
-                type="text"
-                value={newTask}
-                onChange={(e) => setNewTask(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-                placeholder="Add a new task"
-              />
-              
-              {/* Time inputs */}
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={toggleTimeInputs}
-                  className="bg-gray-200 text-gray-600 px-4 py-2 rounded-md hover:bg-gray-300 transition duration-300 ease-in-out flex items-center"
-                >
-                  <Clock size={18} className="mr-2" />
-                  {showTimeInputs ? 'Hide Time' : 'Add Time'}
-                </button>
-                
-                {showTimeInputs && (
-                  <>
-                    <input
-                      type="time"
-                      value={startTime}
-                      onChange={(e) => setStartTime(e.target.value)}
-                      className="border border-gray-300 rounded-md p-2"
-                      placeholder="Start Time"
-                    />
-                    <input
-                      type="time"
-                      value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
-                      className="border border-gray-300 rounded-md p-2"
-                      placeholder="End Time"
-                    />
-                  </>
-                )}
-              </div>
-
-              <button
-                onClick={editingTask ? saveEdit : addTask}
-                className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition duration-300 ease-in-out flex items-center justify-center"
-              >
-                {editingTask ? (
-                  <>
-                    <Edit2 size={18} className="mr-2" />
-                    Update Task
-                  </>
-                ) : (
-                  <>
-                    <PlusCircle size={18} className="mr-2" />
-                    Add Task
-                  </>
-                )}
-              </button>
-            </div>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <header className="bg-gray-800 p-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Cross-functional project plan</h1>
+          <div className="flex space-x-2">
+            <button 
+              className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors flex items-center"
+              onClick={handleManageEmail}
+            >
+              Manage your email
+            </button>
+            <button className="bg-gray-700 text-gray-200 p-2 rounded hover:bg-gray-600 transition-colors">
+              <Filter size={18} />
+            </button>
+            <button className="bg-gray-700 text-gray-200 p-2 rounded hover:bg-gray-600 transition-colors">
+              <SortAsc size={18} />
+            </button>
+            <button className="bg-gray-700 text-gray-200 p-2 rounded hover:bg-gray-600 transition-colors">
+              <LayoutGrid size={18} />
+            </button>
+            <button className="bg-gray-700 text-gray-200 p-2 rounded hover:bg-gray-600 transition-colors">
+              <MoreHorizontal size={18} />
+            </button>
           </div>
-
-          {/* Task list */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <ul className="divide-y divide-gray-200">
-              {tasks.map(task => (
-                <li key={task.id} className="flex items-center p-4 hover:bg-gray-50 transition duration-150 ease-in-out">
-                  <span 
-                    className={`flex-1 ${task.completed ? 'line-through text-gray-500' : 'text-gray-900'}`}
-                  >
-                    {task.text}
-                  </span>
-                  <div className="flex items-center space-x-4">
-                    {task.startTime && (
-                      <span className="text-gray-500 text-sm">
-                        {task.startTime} - {task.endTime}
-                      </span>
-                    )}
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => toggleComplete(task.id)}
-                        className={`p-2 rounded-full ${task.completed ? 'bg-green-500' : 'bg-gray-200'} hover:bg-opacity-80 transition duration-300 ease-in-out`}
-                      >
-                        <CheckCircle size={18} className={task.completed ? 'text-white' : 'text-gray-600'} />
-                      </button>
-                      <button
-                        onClick={() => startEditing(task)}
-                        className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition duration-300 ease-in-out"
-                      >
-                        <Edit2 size={18} />
-                      </button>
-                      <button
-                        onClick={() => deleteTask(task.id)}
-                        className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition duration-300 ease-in-out"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+        </header>
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 p-6">
+          {renderTaskList('To do')}
+          {renderTaskList('Doing')}
+          {renderTaskList('Done')}
+        </main>
       </div>
     </div>
   );
 };
 
-export default TaskList;
+export default StartDay;

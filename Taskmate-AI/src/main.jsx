@@ -13,12 +13,13 @@ import TaskList from "../src/InnerPages/TaskList.jsx"
 import TaskManagement from './InnerPages/TaskManagament.jsx';
 import { TaskProvider } from './Contexs/TaskContex.jsx';
 import AI from './InnerPages/Ai.jsx';
+import StartDay from './InnerPages/StartDay.jsx'
+import EmailManage from './InnerPages/emailManage.jsx';
 
 
 // Placeholder components for other pages
 
 const Roadmap = () => <div>Roadmap Page</div>;
-const StartMyDay = () => <div>Start My Day Page</div>;
 
 const router = createBrowserRouter([
   {
@@ -52,6 +53,15 @@ const router = createBrowserRouter([
   {
     path: "/roadmap",
     element: <Roadmap />,
+  },{
+    
+      path: "/startmyday",
+      element: <StartDay />,
+    
+  },
+  {
+    path: "/emailmanage",
+    element: <EmailManage />,
   }
 ]);
 
