@@ -1,14 +1,31 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Filter, SortAsc, LayoutGrid, MoreHorizontal, ChevronDown, User, Clock, ArrowUpDown } from 'lucide-react';
 
 const StartDay = () => {
-  const navigate = useNavigate();
-  const [tasks, setTasks] = useState([
-    // Sample task data for illustration, you can modify it as needed.
-    { id: 1, name: 'Task 1', assignee: 'John', dueDate: '6 Oct - Today', priority: 'Low', status: 'On track' },
-    { id: 2, name: 'Task 2', assignee: 'Alice', dueDate: null, priority: 'Medium', status: 'At risk' },
-  ]);
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    // Fetch tasks from task management
+    const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    setTasks(storedTasks);
+  }, []);
+
+  const updateTaskPriority = (taskId, newPriority) => {
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, priority: newPriority } : task
+    );
+    setTasks(updatedTasks);
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+  };
+
+  const updateTaskStatus = (taskId, newStatus) => {
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, status: newStatus } : task
+    );
+    setTasks(updatedTasks);
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+  };
 
   const renderTaskList = (sectionTitle) => (
     <div className="mb-6">
@@ -16,62 +33,55 @@ const StartDay = () => {
         <ChevronDown className="mr-2 text-gray-400" />
         <h2 className="text-lg font-semibold text-gray-200">{sectionTitle}</h2>
       </div>
-      {tasks.filter(task => task.status === sectionTitle).map(task => (
+      {tasks.map(task => (
         <div key={task.id} className="flex items-center py-2 border-b border-gray-700">
           <input type="checkbox" className="mr-3" />
           <div className="flex-1">
-            <p className="text-gray-200">{task.name}</p>
+            <p className="text-gray-200">{task.text}</p>
           </div>
           <div className="flex items-center space-x-4">
             <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
               <User size={16} className="text-white" />
             </div>
-            {task.dueDate ? (
-              <span className="text-gray-400">{task.dueDate}</span>
+            {task.startTime ? (
+              <span className="text-gray-400">{task.startTime} - {task.endTime}</span>
             ) : (
               <Clock size={16} className="text-gray-400" />
             )}
             <div className="relative">
-              <span
+              <select
+                value={task.priority || 'Medium'}
+                onChange={(e) => updateTaskPriority(task.id, e.target.value)}
                 className={`px-2 py-1 rounded text-xs cursor-pointer ${
                   task.priority === 'Low' ? 'bg-green-800 text-green-200' :
                   task.priority === 'Medium' ? 'bg-yellow-800 text-yellow-200' :
                   'bg-red-800 text-red-200'
                 }`}
-                onClick={() => togglePriority(task.id)}
               >
-                {task.priority}
-              </span>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </select>
               <ArrowUpDown size={12} className="absolute -right-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
-            <span className={`px-2 py-1 rounded text-xs ${
-              task.status === 'On track' ? 'bg-green-800 text-green-200' :
-              task.status === 'At risk' ? 'bg-yellow-800 text-yellow-200' :
-              'bg-red-800 text-red-200'
-            }`}>
-              {task.status}
-            </span>
+            <select
+              value={task.status || 'in work'}
+              onChange={(e) => updateTaskStatus(task.id, e.target.value)}
+              className={`px-2 py-1 rounded text-xs ${
+                task.status === 'in work' ? 'bg-blue-800 text-blue-200' :
+                task.status === 'completed' ? 'bg-green-800 text-green-200' :
+                'bg-purple-800 text-purple-200'
+              }`}
+            >
+              <option value="in work">In Work</option>
+              <option value="completed">Completed</option>
+              <option value="in future">In Future</option>
+            </select>
           </div>
         </div>
       ))}
     </div>
   );
-
-  const togglePriority = (taskId) => {
-    setTasks(prevTasks => prevTasks.map(task => {
-      if (task.id === taskId) {
-        const priorities = ['Low', 'Medium', 'High'];
-        const currentIndex = priorities.indexOf(task.priority);
-        const nextPriority = priorities[(currentIndex + 1) % priorities.length];
-        return { ...task, priority: nextPriority };
-      }
-      return task;
-    }));
-  };
-
-  const handleManageEmail = () => {
-    navigate('/emailmanage');
-  };
 
   return (
     <div className="flex h-screen bg-gray-900 text-gray-200">
@@ -94,10 +104,7 @@ const StartDay = () => {
         <header className="bg-gray-800 p-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Cross-functional project plan</h1>
           <div className="flex space-x-2">
-            <button 
-              className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors flex items-center"
-              onClick={handleManageEmail}
-            >
+            <button className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors flex items-center">
               Manage your email
             </button>
             <button className="bg-gray-700 text-gray-200 p-2 rounded hover:bg-gray-600 transition-colors">
@@ -115,9 +122,7 @@ const StartDay = () => {
           </div>
         </header>
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 p-6">
-          {renderTaskList('To do')}
-          {renderTaskList('Doing')}
-          {renderTaskList('Done')}
+          {renderTaskList('All Tasks')}
         </main>
       </div>
     </div>
