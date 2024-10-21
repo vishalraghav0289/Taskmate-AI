@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Filter, SortAsc, LayoutGrid, MoreHorizontal, ChevronDown, User, Clock, ArrowUpDown } from 'lucide-react';
+import { Filter, SortAsc, LayoutGrid, MoreHorizontal, ChevronDown, User, Clock, ArrowUpDown, Calendar } from 'lucide-react';
 
 const StartDay = () => {
   const [tasks, setTasks] = useState([]);
+  const [showDatePicker, setShowDatePicker] = useState(null);
 
   useEffect(() => {
     // Fetch tasks from task management
@@ -25,6 +26,39 @@ const StartDay = () => {
     );
     setTasks(updatedTasks);
     localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+  };
+
+  const updateTaskDate = (taskId, newDate) => {
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, dueDate: newDate } : task
+    );
+    setTasks(updatedTasks);
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    setShowDatePicker(null);
+  };
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  const renderDatePicker = (taskId) => {
+    const today = new Date().toISOString().split('T')[0];
+    const maxDate = new Date();
+    maxDate.setFullYear(maxDate.getFullYear() + 1);
+    const maxDateString = maxDate.toISOString().split('T')[0];
+
+    return (
+      <div className="absolute z-10 mt-2 bg-gray-800 rounded-md shadow-lg p-2">
+        <input
+          type="date"
+          min={today}
+          max={maxDateString}
+          onChange={(e) => updateTaskDate(taskId, e.target.value)}
+          className="bg-gray-700 text-white px-2 py-1 rounded"
+        />
+      </div>
+    );
   };
 
   const renderTaskList = (sectionTitle) => (
@@ -52,11 +86,7 @@ const StartDay = () => {
               <select
                 value={task.priority || 'Medium'}
                 onChange={(e) => updateTaskPriority(task.id, e.target.value)}
-                className={`px-2 py-1 rounded text-xs cursor-pointer ${
-                  task.priority === 'Low' ? 'bg-green-800 text-green-200' :
-                  task.priority === 'Medium' ? 'bg-yellow-800 text-yellow-200' :
-                  'bg-red-800 text-red-200'
-                }`}
+                className="px-2 py-1 rounded text-xs cursor-pointer bg-gray-700 text-white"
               >
                 <option value="Low">Low</option>
                 <option value="Medium">Medium</option>
@@ -67,16 +97,22 @@ const StartDay = () => {
             <select
               value={task.status || 'in work'}
               onChange={(e) => updateTaskStatus(task.id, e.target.value)}
-              className={`px-2 py-1 rounded text-xs ${
-                task.status === 'in work' ? 'bg-blue-800 text-blue-200' :
-                task.status === 'completed' ? 'bg-green-800 text-green-200' :
-                'bg-purple-800 text-purple-200'
-              }`}
+              className="px-2 py-1 rounded text-xs bg-gray-700 text-white"
             >
               <option value="in work">In Work</option>
               <option value="completed">Completed</option>
               <option value="in future">In Future</option>
             </select>
+            <div className="relative">
+              <button
+                onClick={() => setShowDatePicker(showDatePicker === task.id ? null : task.id)}
+                className="px-2 py-1 rounded text-xs bg-gray-700 text-white flex items-center"
+              >
+                <Calendar size={12} className="mr-1" />
+                {task.dueDate ? formatDate(task.dueDate) : 'Assign Date'}
+              </button>
+              {showDatePicker === task.id && renderDatePicker(task.id)}
+            </div>
           </div>
         </div>
       ))}
