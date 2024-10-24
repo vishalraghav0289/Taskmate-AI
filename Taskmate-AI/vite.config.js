@@ -8,6 +8,9 @@ export default defineConfig(({ command, mode }) => {
 
   return {
     plugins: [react()],
+    build: {
+      outDir: 'dist',
+    },
     define: {
       'import.meta.env.VITE_OPENAI_API_KEY': JSON.stringify(env.VITE_OPENAI_API_KEY),
     },

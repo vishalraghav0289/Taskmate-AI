@@ -1,53 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Send, Loader } from 'lucide-react';
+import axios from 'axios';
+
+const API_URL = 'http://localhost:5000/api/chat';
 
 const AI = () => {
   const [input, setInput] = useState('');
   const [conversation, setConversation] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
 
-  // Scroll to the bottom for new messages
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(scrollToBottom, [conversation]);
-
-  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-  // Retry mechanism for handling rate-limiting errors
-  const fetchWithRetry = async (url, options, retries = 3, backoff = 300) => {
-    console.log("Fetch options:", options);
-    try {
-      const response = await fetch(url, options);
-      console.log("API Response status:", response.status);
-
-      if (response.status === 429 && retries > 0) {
-        console.warn(`Rate limited. Retrying after ${backoff}ms...`);
-        await sleep(backoff);
-        return fetchWithRetry(url, options, retries - 1, backoff * 2);
-      }
-
-      if (!response.ok) {
-        console.error(`Error! Status: ${response.status}`);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const jsonResponse = await response.json();
-      console.log("API Response JSON:", jsonResponse);
-      return jsonResponse;
-
-    } catch (error) {
-      console.error("Error during fetch:", error);
-      if (retries > 0) {
-        await sleep(backoff);
-        return fetchWithRetry(url, options, retries - 1, backoff * 2);
-      }
-      throw error;
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,38 +26,27 @@ const AI = () => {
     setConversation(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
-
-    console.log("User message sent:", userMessage);
+    setError(null);
 
     try {
-      // Add console logs for debugging
-      console.log("Fetching API with the following headers:");
-      console.log("Authorization Header:", `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`);
+      console.log('Sending request to backend...');
+      const response = await axios.post(API_URL, {
+        messages: [...conversation, userMessage],
+      });
+      console.log('Received response from backend:', response.data);
 
-      const data = await fetchWithRetry(
-        '/api/v1/chat/completions', // Using proxy as per vite.config.js
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
-          },
-          body: JSON.stringify({
-            model: "gpt-3.5-turbo",
-            messages: [...conversation, userMessage],
-          })
-        }
-      );
+      if (response.data.error) {
+        throw new Error(response.data.error);
+      }
 
-      const aiMessage = { role: 'assistant', content: data.choices[0].message.content };
-      console.log("AI Response received:", aiMessage);
-
+      const aiMessage = { role: 'assistant', content: response.data.choices[0].message.content };
       setConversation(prev => [...prev, aiMessage]);
-
     } catch (error) {
-      console.error('Error calling OpenAI API:', error);
-      const errorMessage = { role: 'assistant', content: 'Sorry, there was an error processing your request. Please try again later.' };
-      setConversation(prev => [...prev, errorMessage]);
+      console.error('Error calling API:', error);
+      setError(`Error: ${error.response?.data?.error || error.message}`);
+      if (error.response?.data?.details) {
+        console.error('Error details:', error.response.data.details);
+      }
     }
 
     setIsLoading(false);
@@ -121,6 +79,14 @@ const AI = () => {
               </div>
             </div>
           ))}
+          {error && (
+            <div className="flex justify-center">
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <strong className="font-bold">Error: </strong>
+                <span className="block sm:inline">{error}</span>
+              </div>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
 

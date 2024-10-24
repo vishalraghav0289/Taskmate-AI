@@ -15,11 +15,10 @@ import { TaskProvider } from './Contexs/TaskContex.jsx';
 import AI from './InnerPages/Ai.jsx';
 import StartDay from './InnerPages/StartDay.jsx'
 import EmailManage from './InnerPages/emailManage.jsx';
+import Roadmap from './InnerPages/Roadmap.jsx';
 
 
-// Placeholder components for other pages
 
-const Roadmap = () => <div>Roadmap Page</div>;
 
 const router = createBrowserRouter([
   {

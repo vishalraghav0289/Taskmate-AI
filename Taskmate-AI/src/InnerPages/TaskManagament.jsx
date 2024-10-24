@@ -143,7 +143,7 @@ const TaskManagement = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-500">
-      {/* Left-hand side menu */}
+
       <div className="w-64 bg-white shadow-md flex-shrink-0">
         <div className="p-4">
           <h2 className="text-2xl font-bold text-purple-700">Task Mate AI</h2>
@@ -157,8 +157,7 @@ const TaskManagement = () => {
         </nav>
       </div>
 
-      {/* Main content area */}
-      <div className="flex-1 p-8 flex flex-col">
+      <div className="flex-1 p-8 flex flex-col  h-full">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Task Management</h1>
         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           {categories.map(category => (

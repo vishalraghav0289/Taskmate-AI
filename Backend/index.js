@@ -1,35 +1,51 @@
-const express = require('express');
-const { Configuration, OpenAIApi } = require('openai');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import axios from 'axios';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
+const port = process.env.PORT || 5000;
+
+app.use(cors());
 app.use(express.json());
 
-// Set up OpenAI API client
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
-
-// Endpoint to interact with ChatGPT
-app.post('/chat', async (req, res) => {
+app.post('/api/chat', async (req, res) => {
+  console.log('Received request:', req.body);
   try {
-    const { prompt } = req.body;
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY is not set in the environment variables');
+    }
 
-    // Send request to OpenAI's API
-    const response = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo', // or another model, e.g., 'gpt-4'
-      messages: [{ role: 'user', content: prompt }],
+    console.log('Sending request to OpenAI...');
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: "gpt-3.5-turbo",
+      messages: req.body.messages,
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
     });
-
-    // Send the response back to the client
-    res.json({ response: response.data.choices[0].message.content });
+    console.log('Received response from OpenAI:', response.data);
+    res.json(response.data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error:', error.response ? error.response.data : error.message);
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.type === 'insufficient_quota') {
+      res.status(402).json({
+        error: 'OpenAI API quota exceeded. Please check your plan and billing details.',
+        details: error.response.data
+      });
+    } else {
+      res.status(500).json({ 
+        error: 'An error occurred while processing your request.',
+        details: error.response ? error.response.data : error.message
+      });
+    }
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
